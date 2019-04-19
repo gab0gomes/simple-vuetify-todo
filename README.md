@@ -1,4 +1,5 @@
-# curriculum-browser
+# simple-vuetify-todo
+Simple todo app maked with vuetify
 
 ## Project setup
 ```
