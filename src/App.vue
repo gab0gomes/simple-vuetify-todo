@@ -15,7 +15,7 @@
 			<v-toolbar-title
 				class="teal--text text--lighten-2"
 			>
-				Vue Sertão Todo List
+				Vuetify Todo List
 			</v-toolbar-title>
 		</v-toolbar>
 
