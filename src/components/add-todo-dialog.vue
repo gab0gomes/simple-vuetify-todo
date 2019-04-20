@@ -2,19 +2,14 @@
   <div class="text-xs-center">
     <v-dialog v-model="showDialog" width="500" persistent>
       <v-card>
-        <v-card-title class="title grey lighten-2" primary-title>Novo Todo</v-card-title>
+        <v-card-title class="title cyan darken-4 teal--text text--lighten-2" primary-title>Novo Todo</v-card-title>
 
         <v-card-text>
           <v-form ref="form">
             <v-container>
               <v-layout row wrap>
                 <v-flex xs12>
-                  <v-text-field
-                      v-model="title"
-                      label="Título"
-                      autofocus
-                      :rules="[rules.required]"
-                ></v-text-field>
+                  <v-text-field v-model="title" label="Título" autofocus :rules="[rules.required]"></v-text-field>
                 </v-flex>
                 <v-flex xs12>
                   <v-menu
@@ -30,18 +25,14 @@
                   >
                     <template v-slot:activator="{ on }">
                       <v-text-field
-                        v-model="computedDateFormatted"
+                        v-model="dateFormatted"
                         label="Data"
                         readonly
                         v-on="on"
                         :rules="[rules.required]"
                       ></v-text-field>
                     </template>
-                    <v-date-picker
-                        v-model="date"
-                        no-title
-                        @input="showDatePicker = false"
-                    ></v-date-picker>
+                    <v-date-picker v-model="date" no-title @input="showDatePicker = false"></v-date-picker>
                   </v-menu>
                 </v-flex>
                 <v-flex>
@@ -84,7 +75,7 @@
         <v-divider></v-divider>
 
         <v-card-actions>
-          <v-btn color="red" flat @click="$emit('dismiss')">Cancelar</v-btn>
+          <v-btn color="red" flat @click="dismissDialog">Cancelar</v-btn>
           <v-spacer></v-spacer>
           <v-btn color="primary" flat @click="submitForm">Confirmar</v-btn>
         </v-card-actions>
@@ -98,51 +89,43 @@ export default {
   props: {
     dialog: {
       type: Boolean,
-      default: false,
-    },
+      default: false
+    }
   },
   data() {
     return {
       title: null,
       showDialog: false,
-      date: new Date().toISOString().substr(0, 10),
+      date: null,
       time: null,
       showDatePicker: false,
       showTimePicker: false,
-      dateFormatted: this.formatDate(new Date().toISOString().substr(0, 10)),
       rules: {
-        required: value => !!value || 'Campo obrigatório.',
-      },
+        required: value => (!!value && !!value.trim()) || 'Campo obrigatório.'
+      }
     };
   },
 
   computed: {
-    computedDateFormatted: {
-        get() {
-          return this.formatDate(this.date);
-        },
-        set() {
-
-        }
+    dateFormatted: {
+      get() {
+        return this.formatDate(this.date);
+      },
+      set() {}
     },
     submitPacket() {
       return {
         date: this.dateFormatted,
         time: this.time,
-        title: this.title,
+        title: this.title
       };
-    },
+    }
   },
 
   watch: {
     dialog() {
-			this.$refs.form.reset();
-			this.date = new Date().toISOString().substr(0, 10);
       this.showDialog = this.dialog;
-    },
-    date() {
-      this.dateFormatted = this.formatDate(this.date);
-    },
+    }
   },
 
   methods: {
@@ -161,9 +144,17 @@ export default {
     submitForm() {
       if (this.$refs.form.validate()) {
         this.$emit('success', this.submitPacket);
+        this.resetForm();
       }
     },
-  },
+    resetForm() {
+      this.$refs.form.reset();
+    },
+    dismissDialog() {
+      this.$emit('dismiss');
+      this.resetForm();
+    }
+  }
 };
 </script>
 

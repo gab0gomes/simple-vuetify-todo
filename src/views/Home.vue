@@ -17,18 +17,28 @@
             >Nada a fazer.</v-alert>
 
             <v-list v-show="todoList.length > 0" two-line>
-              <v-list-tile v-for="todo in todoList" :key="todo.id">
-                <v-list-tile-action>
-                  <v-checkbox></v-checkbox>
-                </v-list-tile-action>
+              <template v-for="(todo, index) in todoList">
+                <v-list-tile :key="todo.id">
+                  <v-list-tile-action>
+                    <v-checkbox color="teal" @change="toggleDone($event, todo.id)"></v-checkbox>
+                  </v-list-tile-action>
 
-                <v-list-tile-content>
-                  <v-list-tile-title>{{ todo.title }}</v-list-tile-title>
-                  <v-list-tile-sub-title>
-                      {{ `${todo.date} às ${todo.time}h` }}
-                  </v-list-tile-sub-title>
-                </v-list-tile-content>
-              </v-list-tile>
+                  <v-list-tile-content>
+                    <v-list-tile-title>
+                      <s v-if="todo.done">{{ todo.title }}</s>
+                      <p v-else>{{ todo.title }}</p>
+                    </v-list-tile-title>
+                    <v-list-tile-sub-title>{{ `${todo.date} às ${todo.time}h` }}</v-list-tile-sub-title>
+                  </v-list-tile-content>
+
+                  <v-list-tile-action>
+                    <v-btn flat icon color="grey" @click="removeTodo(todo.id)">
+                      <v-icon>delete</v-icon>
+                    </v-btn>
+                  </v-list-tile-action>
+                </v-list-tile>
+                <v-divider v-if="index + 1 < todoList.length" :key="index"></v-divider>
+              </template>
             </v-list>
           </v-card-text>
 
@@ -48,26 +58,24 @@
         </v-card>
       </v-flex>
     </v-layout>
-    <add-todo-dialog
-        :dialog="showDialog"
-        @dismiss="showDialog = false"
-        @success="createTodo"
-    ></add-todo-dialog>
+    <add-todo-dialog :dialog="showDialog" @dismiss="showDialog = false" @success="createTodo"></add-todo-dialog>
   </v-container>
 </template>
 
 <script>
-import addTodoDialog from '../components/add-todo-dialog.vue';
+import _ from "lodash";
+
+import addTodoDialog from "../components/add-todo-dialog.vue";
 
 export default {
   components: {
-    addTodoDialog,
+    addTodoDialog
   },
 
   data() {
     return {
       showDialog: false,
-      todoList: [],
+      todoList: []
     };
   },
 
@@ -76,9 +84,22 @@ export default {
       this.showDialog = false;
       this.todoList.push({
         id: Date.now(),
-        ...todoData,
+        done: false,
+        ...todoData
       });
     },
-  },
+    removeTodo(id) {
+      this.todoList = _.filter(this.todoList, function(todo) {
+        return todo.id !== id;
+      });
+    },
+    toggleDone(e, id) {
+      let index = _.findIndex(this.todoList, function(todo) {
+        return todo.id === id;
+      });
+
+      this.todoList[index].done = e;
+    }
+  }
 };
 </script>
